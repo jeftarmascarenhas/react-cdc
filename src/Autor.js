@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import InputCustomizado from './components/InputCustomizado';
 import ButtonCustomizado from './components/ButtonCustomizado';
+import PubSub from 'pubsub-js';
 
 class FormAutorCustomizado extends Component {
 
@@ -24,9 +25,9 @@ enviaForm (evento) {
         type:'post',
         data: JSON.stringify({nome:this.state.nome, email:this.state.email, senha:this.state.senha}),
         success: function (resp) {
-            this.props.callBackAtualizarLista(resp);
+            PubSub.publish('atualizar-lista-autores', resp);
             this.setState({nome:'', email:'', senha:''});
-            console.log('Dados enviado com sucesso', resp);
+
         }.bind(this),
             error: function (resp) {
             console.log('Erro de envio tipo do erro:', resp);
@@ -75,12 +76,12 @@ class TabelaAutoresCustomizado extends  Component {
                   <tbody>
                       {
                         this.props.lista.map(function(autor) {
-                          return (
-                            <tr key={autor.id}>
-                              <td>{autor.nome}</td>
-                              <td>{autor.email}</td>
-                            </tr>
-                          );
+                            return (
+                                <tr key={autor.id}>
+                                <td>{autor.nome}</td>
+                                <td>{autor.email}</td>
+                                </tr>
+                            );
                         })
                       }
                   </tbody>
@@ -94,33 +95,41 @@ export default class AutorBox extends Component {
 
     constructor () {
         super();
-        this.state = {lista: []};
+        this.state = {lista: [], loading:false};
         this.atualizarLista = this.atualizarLista.bind(this);
     }
 
 /*Poderia usar o componentWillMount porem ele é carregado antes do render como
   não tenho dados para mostrar antes do render() uso o componentDidMount que carrega após
   o componente ser renderizado*/
-    componentDidMount() {
-        console.log('WillMount');
+    componentDidMount () { // listagem
+        console.log('DidMount');
         $.ajax({
         url:'http://cdc-react.herokuapp.com/api/autores',
         dataType: 'json',
-        success: function  (resposta) {
+        type: 'get',
+        success: function  (resp) {
             console.log('Chegou a resposta o react vai atualizar, foda!!!!');
-            this.setState({lista: resposta});
+            this.setState({lista: resp, loading:false});
         }.bind(this)
         });
+
+        PubSub.subscribe('atualizar-lista-autores', function (topico, resp) {
+            this.setState({lista: resp});
+        }.bind(this));
     }
 
-    atualizarLista (novaLista) {
-        this.setState({lista: novaLista});
+    atualizarLista (resp) {
+        if(resp) {
+            this.setState({loading:true});
+        }
+        this.setState({lista: resp});
     }
     render () {
         return (
             <div>
-                <FormAutorCustomizado callBackAtualizarLista={this.atualizarLista}/>
-                <TabelaAutoresCustomizado lista={this.state.lista}/>
+                <FormAutorCustomizado/>
+                <TabelaAutoresCustomizado lista={this.state.lista} loadingRefresh={this.state.loading}/>
             </div>
         );
     }
