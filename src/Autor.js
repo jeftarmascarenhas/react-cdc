@@ -3,6 +3,7 @@ import $ from 'jquery';
 import InputCustomizado from './components/InputCustomizado';
 import ButtonCustomizado from './components/ButtonCustomizado';
 import PubSub from 'pubsub-js';
+import TratadorErros from './TratadorErros'
 
 class FormAutorCustomizado extends Component {
 
@@ -30,7 +31,9 @@ enviaForm (evento) {
 
         }.bind(this),
             error: function (resp) {
-            console.log('Erro de envio tipo do erro:', resp);
+                if(resp.status === 400) {
+                    new TratadorErros().publicaErros(resp.responseJSON);
+                }
         }
     });
 }
