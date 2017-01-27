@@ -134,8 +134,14 @@ export default class AutorBox extends Component {
     render () {
         return (
             <div>
-                <FormAutorCustomizado/>
-                <TabelaAutoresCustomizado lista={this.state.lista} loadingRefresh={this.state.loading}/>
+                <div className="header">
+                <h1>Cadastro de Autor</h1>
+                <h2>By Jeftar Mascarenhas</h2>
+                </div>
+                <div className="content" id="content">
+                    <FormAutorCustomizado/>
+                    <TabelaAutoresCustomizado lista={this.state.lista} loadingRefresh={this.state.loading}/>
+                </div>
             </div>
         );
     }
