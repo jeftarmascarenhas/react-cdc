@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import $ from 'jquery';
-import InputCustomizado from './components/InputCustomizado';
-import ButtonCustomizado from './components/ButtonCustomizado';
-import PubSub from 'pubsub-js';
+import React, { Component } from 'react'
+import $ from 'jquery'
+import InputCustomizado from './components/InputCustomizado'
+import ButtonCustomizado from './components/ButtonCustomizado'
+import PubSub from 'pubsub-js'
 import TratadorErros from './TratadorErros'
 
 class FormAutorCustomizado extends Component {
@@ -17,7 +17,7 @@ class FormAutorCustomizado extends Component {
     }
 
 enviaForm (evento) {
-    console.log({nome:this.state.name, email:this.state.email, senha:this.state.senha});
+    console.log({nome:this.state.nome, email:this.state.email, senha:this.state.senha});
     evento.preventDefault();
     $.ajax({
         url:'http://cdc-react.herokuapp.com/api/autores',
@@ -30,10 +30,13 @@ enviaForm (evento) {
             this.setState({nome:'', email:'', senha:''});
 
         }.bind(this),
-            error: function (resp) {
+        error: function (resp) {
                 if(resp.status === 400) {
                     new TratadorErros().publicaErros(resp.responseJSON);
-                }
+            }
+        },
+        beforeSend: function  () {
+            PubSub.publish('limpa-erro', {});
         }
     });
 }

@@ -4,8 +4,8 @@ export default class TratadorErros {
 
     publicaErros(erros) {
         erros.errors.forEach(function(erro) {
-            let msg = erro.defaultMessage;
-            PubSub.publish('erro-validacao', msg);
+            let msgError = {message: erro.defaultMessage, field: erro.field};
+            PubSub.publish('erro-validacao', msgError);
         }, this);
     }
 }

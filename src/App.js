@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import './pure-min.css';
-import './side-menu.css';
-import AutorBox from './Autor';
+import React, { Component } from 'react'
+import './pure-min.css'
+import './side-menu.css'
+import AutorBox from './Autor'
 
 class App extends Component {
 
